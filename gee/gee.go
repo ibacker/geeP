@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 )
 
 type HandlerFunc func(ctx *Context)
@@ -38,8 +39,15 @@ func (engine *Engine) POST(pattern string, handlerFunc HandlerFunc) {
 
 // 实现了 handler 方法
 func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	var middlewares []HandlerFunc
+	for _, group := range engine.groups {
+		if strings.HasPrefix(req.URL.Path, group.prefix) {
+			middlewares = append(middlewares, group.middlewares...)
+		}
+	}
 	ctx := newContext(w, req)
-	engine.router.handler(ctx)
+	ctx.handlers = middlewares
+	engine.router.handle(ctx)
 }
 
 func (engine *Engine) Run(addr string) {

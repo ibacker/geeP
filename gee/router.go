@@ -98,7 +98,7 @@ func (r *router) getRoute(method string, path string) (*node, map[string]string)
 }
 
 // 路由处理
-func (r *router) handler(c *Context) {
+func (r *router) handle(c *Context) {
 	n, params := r.getRoute(c.Method, c.Path)
 	if n != nil {
 		c.Params = params
@@ -110,4 +110,6 @@ func (r *router) handler(c *Context) {
 	} else {
 		c.String(http.StatusNotFound, "404 NOT FOUND : %s\n", c.Path)
 	}
+	// 执行中间件方法
+	c.Next()
 }

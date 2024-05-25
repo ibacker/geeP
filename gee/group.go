@@ -4,7 +4,8 @@ import "log"
 
 // RouterGroup 路由组
 type RouterGroup struct {
-	prefix      string
+	prefix string
+	// 中间件 作用于路由组
 	middlewares []HandlerFunc
 	engine      *Engine
 }
@@ -32,4 +33,9 @@ func (group *RouterGroup) GET(pattern string, handlerFunc HandlerFunc) {
 
 func (group *RouterGroup) POST(pattern string, handlerFunc HandlerFunc) {
 	group.addRoute("POST", pattern, handlerFunc)
+}
+
+// 对路由组添加中间件方法
+func (group *RouterGroup) Use(middlewares ...HandlerFunc) {
+	group.middlewares = append(group.middlewares, middlewares...)
 }

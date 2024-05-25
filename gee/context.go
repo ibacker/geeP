@@ -22,6 +22,10 @@ type Context struct {
 
 	// 响应信息
 	StatusCode int
+
+	// 中间件
+	handlers []HandlerFunc
+	index    int //记录执行到第几个中间件方法了
 }
 
 // 初始化 context
@@ -31,6 +35,16 @@ func newContext(w http.ResponseWriter, req *http.Request) *Context {
 		Req:    req,
 		Path:   req.URL.Path,
 		Method: req.Method,
+		index:  -1,
+	}
+}
+
+// 中间件执行方法
+func (c *Context) Next() {
+	c.index++
+	s := len(c.handlers)
+	for ; c.index < s; c.index++ {
+		c.handlers[c.index](c)
 	}
 }
 
@@ -54,6 +68,12 @@ func (c *Context) Query(key string) string {
 func (c *Context) Status(code int) {
 	c.StatusCode = code
 	c.Writer.WriteHeader(code)
+}
+
+// 异常方法
+func (c *Context) Fail(code int, err string) {
+	c.index = len(c.handlers)
+	c.JSON(code, H{"message": err})
 }
 
 // 设置请求头
