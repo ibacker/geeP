@@ -26,6 +26,9 @@ type Context struct {
 	// 中间件
 	handlers []HandlerFunc
 	index    int //记录执行到第几个中间件方法了
+
+	// engine pointer
+	engine *Engine
 }
 
 // 初始化 context

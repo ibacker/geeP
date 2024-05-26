@@ -98,18 +98,33 @@ func (r *router) getRoute(method string, path string) (*node, map[string]string)
 }
 
 // 路由处理
+//
+//	func (r *router) handle(c *Context) {
+//		n, params := r.getRoute(c.Method, c.Path)
+//		if n != nil {
+//			c.Params = params
+//			// 通过节点路径匹配
+//			key := c.Method + "_" + n.pattern
+//			// 找到对应处理方法并执行
+//			fmt.Println("handler", key)
+//			r.handlers[key](c)
+//		} else {
+//			c.String(http.StatusNotFound, "404 NOT FOUND : %s\n", c.Path)
+//		}
+//		// 执行中间件方法
+//		c.Next()
+//	}
 func (r *router) handle(c *Context) {
 	n, params := r.getRoute(c.Method, c.Path)
+
 	if n != nil {
+		key := c.Method + "-" + n.pattern
 		c.Params = params
-		// 通过节点路径匹配
-		key := c.Method + "_" + n.pattern
-		// 找到对应处理方法并执行
-		fmt.Println("handler", key)
-		r.handlers[key](c)
+		c.handlers = append(c.handlers, r.handlers[key])
 	} else {
-		c.String(http.StatusNotFound, "404 NOT FOUND : %s\n", c.Path)
+		c.handlers = append(c.handlers, func(c *Context) {
+			c.String(http.StatusNotFound, "404 NOT FOUND: %s\n", c.Path)
+		})
 	}
-	// 执行中间件方法
 	c.Next()
 }

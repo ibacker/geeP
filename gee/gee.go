@@ -25,6 +25,14 @@ func New() *Engine {
 	return engine
 }
 
+// Default use Logger() & Recovery middlewares
+func Default() *Engine {
+	engine := New()
+	// 使用中间件
+	engine.Use(Logger(), Recovery())
+	return engine
+}
+
 func (engine *Engine) addRoute(method string, pattern string, handlerFunc HandlerFunc) {
 	engine.router.addRoute(method, pattern, handlerFunc)
 }
@@ -47,6 +55,7 @@ func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 	ctx := newContext(w, req)
 	ctx.handlers = middlewares
+	ctx.engine = engine
 	engine.router.handle(ctx)
 }
 

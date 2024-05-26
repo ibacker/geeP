@@ -35,7 +35,7 @@ func (group *RouterGroup) POST(pattern string, handlerFunc HandlerFunc) {
 	group.addRoute("POST", pattern, handlerFunc)
 }
 
-// 对路由组添加中间件方法
+// Use 对路由组添加中间件方法
 func (group *RouterGroup) Use(middlewares ...HandlerFunc) {
 	group.middlewares = append(group.middlewares, middlewares...)
 }

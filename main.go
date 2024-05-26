@@ -21,7 +21,7 @@ func onlyForV2() gee.HandlerFunc {
 }
 
 func main() {
-	r := gee.New()
+	r := gee.Default()
 	r.GET("/", func(ctx *gee.Context) {
 		ctx.HTML(http.StatusOK, "<h1>Hello</h1>")
 	})
@@ -70,6 +70,13 @@ func main() {
 		})
 	}
 	fmt.Println("gee finished")
+
+	// 异常处理
+	// index out of range for testing Recovery()
+	r.GET("/panic", func(c *gee.Context) {
+		names := []string{"geektutu"}
+		c.String(http.StatusOK, names[100])
+	})
 
 	r.Run(":9999")
 }
