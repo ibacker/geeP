@@ -14,7 +14,7 @@ func onlyForV2() gee.HandlerFunc {
 		// Start timer
 		t := time.Now()
 		// if a server error occurred
-		c.Fail(500, "Internal Server Error")
+		//c.Fail(500, "Internal Server Error")
 		// Calculate resolution time
 		log.Printf("[%d] %s in %v for group v2", c.StatusCode, c.Req.RequestURI, time.Since(t))
 	}
@@ -22,9 +22,7 @@ func onlyForV2() gee.HandlerFunc {
 
 func main() {
 	r := gee.Default()
-	r.GET("/", func(ctx *gee.Context) {
-		ctx.HTML(http.StatusOK, "<h1>Hello</h1>")
-	})
+
 	r.GET("/hello", func(c *gee.Context) {
 		// expect /hello?name=geektutu
 		c.String(http.StatusOK, "hello %s, you're at %s\n", c.Query("name"), c.Path)
@@ -42,15 +40,9 @@ func main() {
 	})
 
 	// 添加 group 后
-	r.GET("/index", func(ctx *gee.Context) {
-		ctx.HTML(http.StatusOK, "<h1>Hello Index</h1>")
-	})
 
 	v1 := r.Group("/v1")
 	{
-		v1.GET("/", func(c *gee.Context) {
-			c.HTML(http.StatusOK, "<h1>Hello Gee</h1>")
-		})
 
 		v1.GET("/hello", func(c *gee.Context) {
 			// expect /hello?name=geektutu
