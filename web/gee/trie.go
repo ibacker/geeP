@@ -83,3 +83,12 @@ func (n *node) search(parts []string, height int) *node {
 	}
 	return nil
 }
+
+func (n *node) travel(list *([]*node)) {
+	if n.pattern != "" {
+		*list = append(*list, n)
+	}
+	for _, child := range n.children {
+		child.travel(list)
+	}
+}
