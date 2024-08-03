@@ -1,8 +1,11 @@
 package lru
 
 import (
+	"fmt"
 	"reflect"
+	"sync"
 	"testing"
+	"time"
 )
 
 type String string
@@ -58,4 +61,25 @@ func TestCache_OnEvicted(t *testing.T) {
 	if !reflect.DeepEqual(expected, keys) {
 		t.Fatalf("cache onEvicted failed %s", keys)
 	}
+}
+
+// sync.Mutex 的使用
+
+var m sync.Mutex
+var set = make(map[int]bool, 0)
+
+func printOnce(num int) {
+	m.Lock()
+	defer m.Unlock()
+	if _, exist := set[num]; !exist {
+		fmt.Println(num)
+	}
+	set[num] = true
+}
+
+func Test_main(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		go printOnce(i)
+	}
+	time.Sleep(time.Second)
 }
