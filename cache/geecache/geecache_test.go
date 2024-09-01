@@ -10,6 +10,7 @@ var db = map[string]string{
 	"Tom":  "234",
 	"Jack": "567",
 	"Zee":  "11",
+	"test": "test",
 }
 
 func Test_GeeCache(t *testing.T) {
