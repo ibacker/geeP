@@ -38,6 +38,7 @@ func (s *sqlite3) TableExistSQL(tableName string) (string, []interface{}) {
 
 var _Dialect = (*sqlite3)(nil)
 
+// 注册 sqlite 数据库 dialect
 func init() {
 	RegisterDialect("sqlite3", &sqlite3{})
 }

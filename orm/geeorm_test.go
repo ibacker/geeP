@@ -17,3 +17,17 @@ func TestNestedGroup(t *testing.T) {
 	count, _ := result.RowsAffected()
 	log.Info("exec success count: ", count)
 }
+
+func OpenDB(t *testing.T) *Engine {
+	t.Helper()
+	engine, err := NewEngine("sqlite3", "gee.db")
+	if err != nil {
+		t.Fatal("field to connect err: ", err)
+	}
+	return engine
+}
+
+func TestNewEngine(t *testing.T) {
+	engine := OpenDB(t)
+	defer engine.Close()
+}

@@ -2,12 +2,14 @@ package orm
 
 import (
 	"database/sql"
+	"orm/dialect"
 	"orm/log"
 	"orm/session"
 )
 
 type Engine struct {
-	db *sql.DB
+	db      *sql.DB
+	dialect dialect.Dialect
 }
 
 func NewEngine(driver, source string) (e *Engine, err error) {
@@ -23,7 +25,12 @@ func NewEngine(driver, source string) (e *Engine, err error) {
 		return
 	}
 
-	e = &Engine{db: db}
+	dia, ok := dialect.GetDialect(driver)
+	if !ok {
+		log.Error("dialect %s not found", driver)
+		return
+	}
+	e = &Engine{db: db, dialect: dia}
 	log.Info("Connected to ", driver, " database")
 	return
 }
@@ -36,5 +43,5 @@ func (engine *Engine) Close() {
 }
 
 func (engine *Engine) NewSession() *session.Session {
-	return session.New(engine.db)
+	return session.New(engine.db, engine.dialect)
 }
