@@ -5,19 +5,19 @@ import (
 	"testing"
 )
 
-//type User struct {
-//	Name string `geeorm:"PRIMARY KEY"`
-//	Age  int
-//}
-//
-//func (User) TableName() string {
-//	return "UserNm"
-//}
+type Person struct {
+	Name   string `geeorm:"PRIMARY KEY"`
+	gender int
+}
+
+func (Person) TableName() string {
+	return "PersonTabel"
+}
 
 var (
-	user1 = &User{"Tom", 14}
-	user2 = &User{"Jack", 13}
-	user3 = &User{"Jerry", 15}
+	user1   = &User{"Tom", 14}
+	user2   = &User{"Jack", 13}
+	person1 = &Person{"Jerry", 1}
 )
 
 func testRecordInit(t *testing.T) *Session {
@@ -32,9 +32,18 @@ func testRecordInit(t *testing.T) *Session {
 	return s
 }
 
+func TestRecordInsert2(t *testing.T) {
+	t.Helper()
+	s := NewSession().Model(&Person{})
+	s.DropTable()
+	s.CreateTable()
+	s.Insert(person1)
+	s.Insert(user2)
+}
+
 func TestRecord(t *testing.T) {
 	s := testRecordInit(t)
-	affected, err := s.Insert(user3)
+	affected, err := s.Insert(user2)
 	if err != nil || affected != 1 {
 		t.Fatalf("failed to insert record")
 	}
