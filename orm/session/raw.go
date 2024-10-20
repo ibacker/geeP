@@ -2,6 +2,7 @@ package session
 
 import (
 	"database/sql"
+	"orm/clause"
 	"orm/dialect"
 	"orm/log"
 	"orm/schema"
@@ -12,6 +13,7 @@ type Session struct {
 	db       *sql.DB
 	dialect  dialect.Dialect
 	refTable *schema.Schema
+	clause   clause.Clause
 	// 执行 sql 语句
 	sql strings.Builder
 	// 变量
@@ -54,7 +56,7 @@ func (s *Session) QueryRow() *sql.Row {
 	return s.DB().QueryRow(s.sql.String(), s.sqlVars...)
 }
 
-func (s *Session) QueryRows(rows *sql.Rows, err error) {
+func (s *Session) QueryRows() (rows *sql.Rows, err error) {
 	defer s.Clear()
 	log.Info(s.sql.String(), s.sqlVars)
 	if rows, err = s.DB().Query(s.sql.String(), s.sqlVars...); err != nil {
