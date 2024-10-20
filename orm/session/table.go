@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// Model 保存对象解析结果
 func (s *Session) Model(value interface{}) *Session {
 	// 空对象、对象变更，更新
 	if s.refTable == nil || reflect.TypeOf(value) != reflect.TypeOf(s.refTable) {
