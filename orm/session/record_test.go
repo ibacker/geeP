@@ -43,7 +43,7 @@ func TestRecordInsert2(t *testing.T) {
 
 func TestRecord(t *testing.T) {
 	s := testRecordInit(t)
-	affected, err := s.Insert(user2)
+	affected, err := s.Insert(user1)
 	if err != nil || affected != 1 {
 		t.Fatalf("failed to insert record")
 	}
@@ -65,4 +65,33 @@ func TestUpdate(t *testing.T) {
 	s.Delete()
 	count, _ := s.Count()
 	log.Info("count", count)
+}
+
+func TestFindFirst(t *testing.T) {
+	s := testRecordInit(t)
+	s.Insert(user2)
+	s.Count()
+	s.Delete()
+	var users []User
+	s.Limit(1).Find(&users)
+	log.Info(users)
+}
+
+func TestSession_OrderBy(t *testing.T) {
+	s := testRecordInit(t)
+	s.Insert(user2)
+	var users []User
+	s.OrderBy("Age asc").Find(&users)
+	log.Info(users)
+}
+
+func TestSession_Delete(t *testing.T) {
+	s := testRecordInit(t)
+	s.Insert(user2)
+	s.Where("Name = ?", "Tom").Delete()
+
+	s1 := NewSession().Model(&User{})
+	var users []User
+	s1.Find(&users)
+	log.Info(users)
 }
