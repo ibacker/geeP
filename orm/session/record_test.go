@@ -7,7 +7,7 @@ import (
 
 type Person struct {
 	Name   string `geeorm:"PRIMARY KEY"`
-	gender int
+	Gender int
 }
 
 func (Person) TableName() string {
@@ -50,4 +50,19 @@ func TestRecord(t *testing.T) {
 	var users []User
 	s.Find(&users)
 	log.Info(users)
+}
+
+func TestUpdate(t *testing.T) {
+	t.Helper()
+	s := NewSession().Model(&Person{})
+	s.DropTable()
+	s.CreateTable()
+	s.Insert(person1)
+	s.Update("Gender", 10)
+	var persons []Person
+	s.Find(&persons)
+	log.Info(persons)
+	s.Delete()
+	count, _ := s.Count()
+	log.Info("count", count)
 }

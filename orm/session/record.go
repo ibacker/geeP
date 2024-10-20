@@ -53,3 +53,43 @@ func (s *Session) Find(values interface{}) error {
 	}
 	return rows.Close()
 }
+
+func (s *Session) Update(kv ...interface{}) (int64, error) {
+	// 默认 kv 是 map 结构，如果不是则按照 kv 的顺序构造 map
+	m, ok := kv[0].(map[string]interface{})
+	if !ok {
+		m = make(map[string]interface{})
+		for i := 0; i < len(kv); i += 2 {
+			m[kv[i].(string)] = kv[i+1]
+		}
+	}
+	// update
+	s.clause.Set(clause.UPDATE, s.RefTable().Name, m)
+	sql, vars := s.clause.Build(clause.UPDATE, clause.WHERE)
+	result, err := s.Raw(sql, vars...).Exec()
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+func (s *Session) Delete() (int64, error) {
+	s.clause.Set(clause.DELETE, s.RefTable().Name)
+	sql, vars := s.clause.Build(clause.DELETE, clause.WHERE)
+	result, err := s.Raw(sql, vars...).Exec()
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+func (s *Session) Count() (int64, error) {
+	s.clause.Set(clause.COUNT, s.RefTable().Name)
+	sql, vars := s.clause.Build(clause.COUNT, clause.WHERE)
+	row := s.Raw(sql, vars...).QueryRow()
+	var tmp int64
+	if err := row.Scan(&tmp); err != nil {
+		return 0, err
+	}
+	return tmp, nil
+}
