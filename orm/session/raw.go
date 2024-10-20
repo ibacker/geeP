@@ -10,7 +10,9 @@ import (
 )
 
 type Session struct {
-	db       *sql.DB
+	db *sql.DB
+	// 事务
+	tx       *sql.Tx
 	dialect  dialect.Dialect
 	refTable *schema.Schema
 	clause   clause.Clause
@@ -29,7 +31,21 @@ func (s *Session) Clear() {
 	s.sqlVars = nil
 }
 
-func (s *Session) DB() *sql.DB {
+// CommonDB 定义 CommonDB接口
+type CommonDB interface {
+	Query(query string, args ...interface{}) (*sql.Rows, error)
+	QueryRow(query string, args ...interface{}) *sql.Row
+	Exec(query string, args ...interface{}) (sql.Result, error)
+}
+
+// 类型断言确保*sql.DB *sql.Tx 实现了 CommonDB 接口
+var _ CommonDB = (*sql.DB)(nil)
+var _ CommonDB = (*sql.Tx)(nil)
+
+func (s *Session) DB() CommonDB {
+	if s.tx != nil {
+		return s.tx
+	}
 	return s.db
 }
 

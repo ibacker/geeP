@@ -45,3 +45,26 @@ func (engine *Engine) Close() {
 func (engine *Engine) NewSession() *session.Session {
 	return session.New(engine.db, engine.dialect)
 }
+
+type TxFunc func(session2 *session.Session) (interface{}, error)
+
+func (engine *Engine) Transaction(f TxFunc) (result interface{}, err error) {
+	s := engine.NewSession()
+	// 启用事务，对 tx 赋值
+	if err := s.Begin(); err != nil {
+		return nil, err
+	}
+	defer func() {
+		// 有异常，回滚事务
+		if p := recover(); p != nil {
+			_ = s.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = s.Rollback()
+		} else {
+			err = s.Commit()
+		}
+	}()
+	// 调用转入的 函数 f
+	return f(s)
+}
